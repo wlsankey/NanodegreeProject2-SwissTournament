@@ -1,9 +1,26 @@
-This file contains instructions for running the Swiss Tournament project.
+SWISS TOURNAMENT application readme file
 
-1. Stand up the PostgreSQL database using the file "tournament.sql". This file contain the necessary sql commands to create the two tables--players and matches-- needed to store data relating to the swiss tournament.
+About application:
+This application simulates a Swiss-style tournament in which players compete each round and pairings are based on the win-loss record of players. 
 
-2. Once the database is standing, run the "tournament.py" file. This file contains all of the methods necessary for the function to operate. 
+Instructions for running the application:
 
-3. Run this file in your development environment to view individual methods. (I used a vagrant Ubuntu environment with ipython and psql. If you go this route, you will need to stand up the database using the appropriate psql commands and running the afore-mentioned "tournament.sql" file. Once your tables have been created, using ipython "-i tournament.py" to test indvidual methods or elements of the tournament such as deleting players or reporting winners of matches.
+1. SETUP: Navigate to via changing directories (cd) to the appropriate folder storing the application files. Run vagrant environment (or setup a new vagrant environment using "vagrant init" and the virtualbox preferred--in this case "ubuntu/trusty32"). Type "vagrant init ubuntu/trusty32". If you are just setting up a vagrant environment be sure to adjust the Vagrantfile and add the following provisioning and configuration information:
 
-4. To run and test the full application, use the tournament_test.py file with ipython (in the vagrant ssh environment). Running this file with the commando "ipython -i tournament_test.py" will run through the unit tests that demonstrate the capabilities of the program.
+  config.vm.provision "shell", path: "pg_config.sh"
+  config.vm.box = "ubuntu/trusty32"
+
+Note that the file "pg_config.sh" is the Udacity-provided shell script that installs python and Postgresql on your box.
+
+
+2. VAGRANT SSH: Type vagrant ssh to enter the shell. Once the secure shell has booted, navigate to the folder containing the project files: "cd /vagrant" is likely the command and location but please make sure this is where you have the files stored. 
+
+
+3.SETUP DATABASE: Now that your virtual machine is setup, you can stand up the database for the application. 
+	a. Type "psql" to start the postegresql application.
+	b. Type "CREATE DATABASE tournament;" to create your database.
+	c. Exit psql by typing "Ctrl + D". Now re-enter and connect to your database by typing "psql tournament"
+	c. Type "\i tournament.sql" to use the existing file to setup your tables and views. After you are done you can exit psql again.
+
+
+4. RUN APPLICATION: In the vagrant command line type: "python tournament_test.py". This should run a test of the application. You will receiving a message verifying whether or not it worked. If for some reason it did not work, please close the application, return to the vagrant command line and try once more to make sure you typed everything correctly.

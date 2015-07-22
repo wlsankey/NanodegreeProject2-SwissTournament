@@ -1,19 +1,18 @@
 #!/usr/bin/env python
-# 
 # tournament.py -- implementation of a Swiss-system tournament
-#
+
 
 import psycopg2
 import math
 
 
 def connect():
-    """Connect to the PostgreSQL database.  Returns a database connection."""
+    # Connect to the PostgreSQL database.  Returns a database connection.
     return psycopg2.connect("dbname=tournament")
 
 
 def deleteMatches():
-    """Remove all the match records from the database."""
+    # Remove all the match records from the database.
     connection = connect()
     c = connection.cursor()
     c.execute("DELETE FROM matches")
@@ -27,7 +26,7 @@ def test():
 
 
 def deletePlayers():
-    """Remove all the player records from the database."""
+    # Remove all the player records from the database.
     connection = connect()
     c = connection.cursor()
     c.execute("DELETE from players")
@@ -37,37 +36,33 @@ def deletePlayers():
 
 
 def countPlayers():
-    """Returns the number of players currently registered."""
+    # Returns the number of players currently registered.
     connection = connect()
     c = connection.cursor()
     c.execute("""SELECT COUNT(*) FROM players;""")
     no_players = c.fetchone()[0]
     no_players = int(no_players)
-    #if no_players == None:
-    #    no_players = 0
     c.close()
     connection.close()
-    #print "The number of players has printed."
-    #print no_players
     return no_players
-    
-    
-   
 
 
 def registerPlayer(name):
-    """Adds a player to the tournament database.
+    """
+    Adds a player to the tournament database.
       c = connection.cursor()
 
     The database assigns a unique serial id number for the player.  (This
     should be handled by your SQL database schema, not in your Python code.)
-  
+
     Args:
       name: the player's full name (need not be unique).
     """
     connection = connect()
     c = connection.cursor()
-    c.execute("""INSERT INTO players (player_name, match_outcomes_wins, no_matches) VALUES(%s, %s, %s)""", (name, int(0), int(0)))
+    query = """INSERT INTO players (player_name, match_outcomes_wins, no_matches) VALUES(%s, %s, %s)"""
+    params = (name, int(0), int(0))
+    c.execute(query, params)
     connection.commit()
     c.close()
     connection.close()
@@ -100,23 +95,20 @@ def playerStandings():
     """
 
 no_players = countPlayers()
-#no_rounds = math.log(no_players, 2)
 no_matches_per_round = (no_players/2)
-
 
 
 def reportMatch(winner, loser):
     connection = connect()
     c = connection.cursor()
-    c.execute ("INSERT INTO matches (player_1_winner, player_2_loser) VALUES (%s, %s)", (winner, loser))
+    c.execute("INSERT INTO matches (player_1_winner, player_2_loser) VALUES (%s, %s)", (winner, loser))
     c.execute("UPDATE players SET match_outcomes_wins = (match_outcomes_wins + 1), no_matches = (no_matches + 1) WHERE player_id = (%s)", (winner,))
-    c.execute("UPDATE players SET no_matches = (no_matches + 1) WHERE player_id = (%s)", (loser,))    
+    c.execute("UPDATE players SET no_matches = (no_matches + 1) WHERE player_id = (%s)", (loser,))
     connection.commit()
     c.close()
     connection.close()
 
-
-    """ 
+    """
     Records the outcome of a single match between two players.
 
     Args:
@@ -124,15 +116,15 @@ def reportMatch(winner, loser):
       loser:  the id number of the player who lost
     """
 
- 
+
 def swissPairings():
     """Returns a list of pairs of players for the next round of a match.
-  
+
     Assuming that there are an even number of players registered, each player
     appears exactly once in the pairings.  Each player is paired with another
     player with an equal or nearly-equal win record, that is, a player adjacent
     to him or her in the standings.
-  
+
     Returns:
       A list of tuples, each of which contains (id1, name1, id2, name2)
         id1: the first player's unique id
@@ -152,12 +144,7 @@ def swissPairings():
         individual_match = first_seed + second_seed
         matches.append(individual_match)
         offset_amount = offset_amount + 2
-        #print offset_amount
-        #print "The number of matches per round is" + str(no_matches_per_round)
+
     c.close()
     connection.close()
     return matches
-    
-
-
-
