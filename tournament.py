@@ -70,17 +70,6 @@ def registerPlayer(name):
 
 def playerStandings():
 
-    connection = connect()
-    c = connection.cursor()
-    c.execute("""SELECT * from players ORDER BY match_outcomes_wins ASC""")
-    player_list = c.fetchall()
-    c.close()
-    connection.close()
-    return_list = []
-    for e in player_list:
-        return_list.append(e)
-    return return_list
-
     """Returns a list of the players and their win records, sorted by wins.
 
     The first entry in the list should be the player in first place, or a player
@@ -94,8 +83,16 @@ def playerStandings():
         matches: the number of matches the player has played
     """
 
-no_players = countPlayers()
-no_matches_per_round = (no_players/2)
+    connection = connect()
+    c = connection.cursor()
+    c.execute("""SELECT * from players ORDER BY match_outcomes_wins ASC""")
+    player_list = c.fetchall()
+    c.close()
+    connection.close()
+    return_list = []
+    for e in player_list:
+        return_list.append(e)
+    return return_list
 
 
 def reportMatch(winner, loser):
@@ -135,7 +132,10 @@ def swissPairings():
     connection = connect()
     c = connection.cursor()
     offset_amount = 0
-    matches = []
+    matches = []    
+    no_players = countPlayers()
+    no_matches_per_round = (no_players/2)
+    
     while (offset_amount/2) < no_matches_per_round:
         c.execute("""SELECT * from standings_view LIMIT 2 OFFSET (%s)""", (offset_amount,))
         standings_output = c.fetchall()
